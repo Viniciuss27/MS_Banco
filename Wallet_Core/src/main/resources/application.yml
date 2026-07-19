@@ -1,4 +1,9 @@
 spring:
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: America/Sao_Paulo
+
   application:
     name: wallet-core 
 
