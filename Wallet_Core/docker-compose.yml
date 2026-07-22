@@ -1,0 +1,41 @@
+services:
+  wallet-pg16:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: db_wallet
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: db_wallet
+    ports:
+      - "5433:5432"
+    volumes:
+      - wallet-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U db_wallet -d db_wallet"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [wallet-net]
+
+  wallet-core:
+    build: .
+    image: wallet-core:v1
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: wallet-pg16
+      DB_PORT: 5432
+      DB_NAME: db_wallet
+      DB_USER: db_wallet
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      wallet-pg16:
+        condition: service_healthy
+    networks: [wallet-net]
+
+networks:
+  wallet-net:
+    driver: bridge
+
+volumes:
+  wallet-pg-data:
