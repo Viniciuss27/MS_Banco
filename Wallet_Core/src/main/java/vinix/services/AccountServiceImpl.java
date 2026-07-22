@@ -20,6 +20,7 @@ import vinix.mapper.AccountMapper;
 import vinix.mapper.TransactionMapper;
 import vinix.repositories.AccountRepository;
 import vinix.repositories.TransactionRepository;
+import vinix.resources.exceptions.DuplicateDocumentException;
 import vinix.services.exceptions.AccountNotFoundException;
 import vinix.services.exceptions.InsufficientBalanceException;
 
@@ -32,9 +33,16 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final TransactionMapper transactionMapper;
 
+ // No AccountServiceImpl.create()
     @Override
     @Transactional
     public AccountResponseDTO create(AccountRequestDTO dto) {
+        String cleanDocument = dto.document().replaceAll("[^0-9]", "");
+
+        if (accountRepository.findByDocument(cleanDocument).isPresent()) {
+            throw new DuplicateDocumentException("Já existe uma conta cadastrada com o documento " + cleanDocument);
+        }
+
         Account account = accountMapper.toEntity(dto);
         return accountMapper.toResponseDTO(accountRepository.save(account));
     }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public record AccountResponseDTO(
 
+		Long id,
 	    String holderName,
 	    String document,
 	    BigDecimal balance,

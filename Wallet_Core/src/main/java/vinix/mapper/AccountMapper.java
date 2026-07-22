@@ -22,5 +22,6 @@ public interface AccountMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "balance", source = "initialBalance")
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "document", expression = "java(dto.document().replaceAll(\"[^0-9]\", \"\"))")
     Account toEntity(AccountRequestDTO dto);
 }
