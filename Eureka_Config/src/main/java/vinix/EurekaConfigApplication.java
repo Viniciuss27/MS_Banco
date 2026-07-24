@@ -1,7 +1,5 @@
 package vinix;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.config.server.EnableConfigServer;
@@ -10,12 +8,12 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 @EnableConfigServer
 @EnableEurekaServer
 @SpringBootApplication
-public class EurekaConfigApplication implements CommandLineRunner{
+public class EurekaConfigApplication /*implements CommandLineRunner*/{
 
 	public static void main(String[] args) {
 		SpringApplication.run(EurekaConfigApplication.class, args);
 	}
-	
+	/*
 	@Value("${GIT_PASSWORD}")
 	private String password;
 	
@@ -26,8 +24,5 @@ public class EurekaConfigApplication implements CommandLineRunner{
 	public void run(String... args) throws Exception {
 		System.out.println("PASSWORD: " + password);
 		System.out.println("USERNAME: " + username);
-	}
-	
-	
-
+	}*/
 }
