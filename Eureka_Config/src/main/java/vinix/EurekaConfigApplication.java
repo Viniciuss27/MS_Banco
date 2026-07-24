@@ -22,7 +22,7 @@ public class EurekaConfigApplication /*implements CommandLineRunner*/{
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("PASSWORD: " + password);
-		System.out.println("USERNAME: " + username);
+		System.out.println("PASSWORD: " + (password != null && !password.isBlank()));;
+		System.out.println("USERNAME: " + (username != null && !username.isBlank()));;
 	}*/
 }
