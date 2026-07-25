@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Eureka_Config
+    name: eureka_config
 
   config:
     import: optional:file:../.env[.properties]
