@@ -1,0 +1,37 @@
+package vinix.config;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+@Component
+public class JwtService {
+
+	@Value("${jwt.secret}")
+	private String secret;
+	
+	@Value("${jwt.expiration}")
+	private Long expiration;
+	
+	public String gerateToken(String email) {
+		SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+		Instant now = Instant.now();
+		
+		return Jwts.builder()
+				.subject(email).issuedAt(Date.from(now))
+				.expiration(Date.from(now.plus(expiration, ChronoUnit.MILLIS)))
+				.signWith(key).compact();
+	}
+	
+	public Long getExpiration() {
+		return expiration;
+	}
+}

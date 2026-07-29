@@ -1,16 +1,12 @@
 package vinix.services;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import vinix.config.JwtService;
 import vinix.dto.request.LoginRequestDTO;
 import vinix.dto.request.RegisterRequestDTO;
 import vinix.dto.response.LoginResponseDTO;
@@ -31,14 +27,15 @@ public class AuthServiceImpl implements AuthService {
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final UserMapper userMapper;
+	private final JwtService jwtService;
 	
 
 	@Override
 	public LoginResponseDTO login(LoginRequestDTO dto) {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(dto.email(), dto.password()));
-		   String token = "00" ;// não criei o gerador de token ainda
-	        return new LoginResponseDTO(token, token, 0);
+		   String token = jwtService.gerateToken(dto.email());
+	        return new LoginResponseDTO(token, "Bearer", jwtService.getExpiration());
 	    }
 
 	@Override
