@@ -26,5 +26,5 @@ public class Role implements Serializable {
 	private Long id;
 
 	@Column(name = "role_name")
-	private String RoleName;
+	private String roleName;
 }
