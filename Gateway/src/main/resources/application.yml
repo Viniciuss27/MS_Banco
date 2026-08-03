@@ -14,11 +14,11 @@ spring:
 
       routes:
         - id: wallet-core
-          uri: http://localhost:8080
+          uri: lb://wallet-core
           predicates:
-            - Path=/wallet/**
+            - Path=/accounts/**,/transactions/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=0
 
         - id: auth
           uri: lb://auth
