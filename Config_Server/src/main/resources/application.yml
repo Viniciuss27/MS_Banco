@@ -1,6 +1,6 @@
 spring:
   application:
-    name: eureka_config
+    name: config_server
 
   config:
     import: optional:file:../.env[.properties]
@@ -16,9 +16,4 @@ spring:
           clone-on-start: true
 
 server:
-  port: 8761
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+  port: 8888

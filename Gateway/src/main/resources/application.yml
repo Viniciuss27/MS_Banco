@@ -1,6 +1,11 @@
 spring:
   application:
     name: gateway
+
+  config:
+    import:
+      - optional:file:../.env[.properties]
+
   cloud:
     gateway:
       discovery:
@@ -9,12 +14,11 @@ spring:
 
       routes:
         - id: wallet-core
-          uri: lb://wallet-core
+          uri: http://localhost:8080
           predicates:
-            - Path=/accounts/**
-            - Path=/transactions/**
+            - Path=/wallet/**
           filters:
-            - StripPrefix=0
+            - StripPrefix=1
 
         - id: auth
           uri: lb://auth
