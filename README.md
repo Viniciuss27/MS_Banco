@@ -1,24 +1,25 @@
-# MS_Banco — Wallet Core (v1: Monólito)
+# MS_Banco — v2: Microsserviços
 
-Simulação de sistema bancário: contas, depósito, saque e transferência,
-com validação de negócio e tratamento de erro completo.
+Evolução do monólito (ver tag `v1-monolito`) para arquitetura de
+microsserviços: Eureka, Config Server, Auth com JWT, Wallet Core
+e API Gateway.
 
-## Stack
-Java 21, Spring Boot 3.2.5, Spring Data JPA, MapStruct, Lombok,
-Bean Validation, Flyway, PostgreSQL, Docker.
+## Serviços
+- **Discovery** (Eureka): service discovery, porta 8761
+- **Config Server**: configuração centralizada via Git privado, porta 8888
+- **Auth**: cadastro, login, emissão de JWT (HS256)
+- **Wallet Core**: contas, depósito, saque, transferência
+- **Gateway**: ponto único de entrada, valida JWT localmente, roteia via Eureka
 
 ## Decisões de arquitetura
-- Monólito modular (não microsserviços): a transferência entre contas
-  precisa de atomicidade real (débito+crédito na mesma transação `@Transactional`).
-  Fatiar isso exigiria Saga pattern com compensação — decisão consciente
-  de não implementar nessa fase.
-- Separação AccountService (regras de saldo) / TransactionService (só leitura).
-- Flyway com `ddl-auto: validate` — schema versionado, Hibernate só confere.
+- Auth e Wallet Core mantêm bancos Postgres separados (um por serviço)
+- Gateway valida o JWT localmente (chave compartilhada via Config Server),
+  sem chamar o Auth a cada requisição — mantém o token stateless
+- Conta e transação permanecem no mesmo serviço (Wallet Core) para
+  preservar atomicidade via `@Transactional`
 
 ## Como rodar
 `docker compose up --build`
 
 ## Roadmap
-Próxima versão evolui para arquitetura de microsserviços
-(Eureka, Gateway, Auth com JWT) — ver tag `v1-monolito` para
-a versão monolito de referência.
+Ver tag `v1-monolito` para a versão anterior, de referência.
