@@ -1,0 +1,121 @@
+services:
+  discovery:
+    build: ./Eureka
+    container_name: discovery
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep UP || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  config-server:
+    build: ./Config_Server
+    container_name: config-server
+    environment:
+      GIT_USERNAME: ${GIT_USERNAME}
+      GIT_PASSWORD: ${GIT_PASSWORD}
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health | grep UP || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  wallet-pg16:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: db_wallet
+    volumes:
+      - wallet-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d db_wallet"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth-pg:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: db_auth
+    volumes:
+      - auth-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d db_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  wallet-core:
+    build: ./Wallet_Core
+    container_name: wallet-core
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_URI: http://discovery:8761/eureka
+      DB_HOST: wallet-pg16
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      discovery:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      wallet-pg16:
+        condition: service_healthy
+
+  auth:
+    build: ./Auth
+    container_name: auth
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_URI: http://discovery:8761/eureka
+      DB_HOST: auth-pg
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    depends_on:
+      discovery:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      auth-pg:
+        condition: service_healthy
+
+  gateway:
+    build: ./Gateway
+    container_name: gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_URI: http://discovery:8761/eureka
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8765:8765"
+    depends_on:
+      discovery:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      auth:
+        condition: service_started
+      wallet-core:
+        condition: service_started
+
+networks:
+  default:
+    name: wallet-net
+
+volumes:
+  wallet-pg-data:
+  auth-pg-data:
