@@ -29,6 +29,8 @@ import vinix.repositories.TransactionRepository;
 import vinix.resources.exceptions.DuplicateDocumentException;
 import vinix.services.exceptions.AccountNotFoundException;
 import vinix.services.exceptions.InsufficientBalanceException;
+import vinix.services.exceptions.InvalidAmountException;
+import vinix.services.exceptions.SameAccountTransferException;
 
 @Service
 @RequiredArgsConstructor
@@ -121,10 +123,9 @@ public class AccountServiceImpl implements AccountService {
         validateAmount(dto.amount());
 
         if (dto.sourceAccountId().equals(dto.targetAccountId())) {
-            throw new IllegalArgumentException(
-                "Não é possível transferir para a mesma conta" );
+            throw new SameAccountTransferException(
+            		"Não é possível transferir para a mesma conta");
         }
-
         // evita deadlock: sempre busca na mesma ordem
         Account source;
         Account target;
@@ -169,7 +170,7 @@ public class AccountServiceImpl implements AccountService {
 
     private void validateAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Valor inválido");
+            throw new InvalidAmountException("Valor inválido");
         }
     }
 

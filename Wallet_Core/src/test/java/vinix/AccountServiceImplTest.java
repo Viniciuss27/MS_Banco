@@ -33,6 +33,8 @@ import vinix.mapper.TransactionMapper;
 import vinix.repositories.AccountRepository;
 import vinix.repositories.TransactionRepository;
 import vinix.services.AccountServiceImpl;
+import vinix.services.exceptions.InvalidAmountException;
+import vinix.services.exceptions.SameAccountTransferException;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
@@ -63,7 +65,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldDepositSuccessfully() {
+    void depositSuccess() {
 
         DepositRequestDTO dto = new DepositRequestDTO(
         		new BigDecimal("200.00"));
@@ -82,7 +84,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldWithdrawSuccessfully() {
+    void withdrawSuccess() {
 
         WithdrawRequestDTO dto = new WithdrawRequestDTO(
         		new BigDecimal("300.00"));
@@ -101,7 +103,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenWithdrawWithoutBalance() {
+    void exceptionWithdrawBalance() {
 
         WithdrawRequestDTO dto = new WithdrawRequestDTO(
         		new BigDecimal("2000.00"));
@@ -118,7 +120,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldTransferSuccessfully() {
+    void transferSuccess() {
 
         TransferRequestDTO dto = new TransferRequestDTO(
                         1L , 2L, new BigDecimal("300.00"));
@@ -140,7 +142,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTransferWithoutBalance() {
+    void exceptionTransferBalance() {
 
         TransferRequestDTO dto = new TransferRequestDTO(
                         1L, 2L, new BigDecimal("5000.00"));
@@ -160,7 +162,7 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenAccountNotFound() {
+    void exceptionAccountNotFound() {
 
         when(accountRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -171,5 +173,24 @@ class AccountServiceImplTest {
 
         assertTrue(exception.getMessage().contains("Conta não encontrada"));
         verify(eventPublisher, never()) .publishEvent(any());
+    }
+    
+    @Test
+    void exceptionTransferAccount() {
+        TransferRequestDTO dto = new TransferRequestDTO(
+        		1L, 1L, new BigDecimal("100.00"));
+
+        assertThrows(SameAccountTransferException.class, 
+        		() -> service.transfer(dto));
+        verify(accountRepository, never()).findById(any());
+    }
+
+    @Test
+    void exceptionAmountIsNegative() {
+        DepositRequestDTO dto = new DepositRequestDTO(new BigDecimal("-50.00"));
+
+        assertThrows(InvalidAmountException.class, 
+        		() -> service.deposit(1L, dto));
+        verify(transactionRepository, never()).save(any());
     }
 }

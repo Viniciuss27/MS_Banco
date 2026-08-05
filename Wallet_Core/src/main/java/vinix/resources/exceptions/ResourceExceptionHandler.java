@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.servlet.http.HttpServletRequest;
 import vinix.services.exceptions.AccountNotFoundException;
 import vinix.services.exceptions.InsufficientBalanceException;
+import vinix.services.exceptions.InvalidAmountException;
+import vinix.services.exceptions.SameAccountTransferException;
 import vinix.services.exceptions.TransactionNotFoundException;
 
 @RestControllerAdvice
@@ -75,6 +77,34 @@ public class ResourceExceptionHandler {
 				request);
 		
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(err);
+	}
+	
+	@ExceptionHandler(InvalidAmountException.class)
+	public ResponseEntity<StandardError> invalidAmount(
+			InvalidAmountException e,
+			HttpServletRequest request) {
+		
+	    StandardError err = buildError(
+	    		HttpStatus.BAD_REQUEST,
+	    		"Valor inválido",
+	    		e.getMessage(),
+	    		request);
+	    
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+
+	@ExceptionHandler(SameAccountTransferException.class)
+	public ResponseEntity<StandardError> sameAccountTransfer(
+			SameAccountTransferException e,
+			HttpServletRequest request) {
+		
+	    StandardError err = buildError(
+	    		HttpStatus.BAD_REQUEST,
+	    		"Transferência inválida",
+	    		e.getMessage(),
+	    		request);
+	    
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
