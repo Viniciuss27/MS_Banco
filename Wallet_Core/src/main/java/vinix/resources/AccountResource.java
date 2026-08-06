@@ -5,12 +5,8 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import jakarta.validation.Valid;
@@ -27,29 +23,37 @@ import vinix.services.AccountService;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping(value = "/accounts")
+@RequestMapping("/accounts")
 public class AccountResource {
 
     private final AccountService service;
 
     @GetMapping
     public ResponseEntity<List<AccountResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+        List<AccountResponseDTO> list = service.findAll();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponseDTO> findById(@PathVariable @Positive Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<AccountResponseDTO> findById(
+            @PathVariable @Positive Long id) {
+
+        AccountResponseDTO response = service.findById(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<AccountResponseDTO> create(@RequestBody @Valid AccountRequestDTO dto) {
+    public ResponseEntity<AccountResponseDTO> create(
+            @RequestBody @Valid AccountRequestDTO dto) {
+
         AccountResponseDTO response = service.create(dto);
+
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
+
         return ResponseEntity.created(uri).body(response);
     }
 
@@ -57,19 +61,25 @@ public class AccountResource {
     public ResponseEntity<TransactionResponseDTO> deposit(
             @PathVariable @Positive Long accountId,
             @RequestBody @Valid DepositRequestDTO dto) {
-        return ResponseEntity.ok(service.deposit(accountId, dto));
+
+        TransactionResponseDTO response = service.deposit(accountId, dto);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{accountId}/withdraw")
     public ResponseEntity<TransactionResponseDTO> withdraw(
             @PathVariable @Positive Long accountId,
             @RequestBody @Valid WithdrawRequestDTO dto) {
-        return ResponseEntity.ok(service.withdraw(accountId, dto));
+
+        TransactionResponseDTO response = service.withdraw(accountId, dto);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/transfer")
     public ResponseEntity<List<TransactionResponseDTO>> transfer(
-    		@RequestBody @Valid TransferRequestDTO dto) {
-        return ResponseEntity.ok(service.transfer(dto));
+            @RequestBody @Valid TransferRequestDTO dto) {
+
+        List<TransactionResponseDTO> response = service.transfer(dto);
+        return ResponseEntity.ok(response);
     }
 }
