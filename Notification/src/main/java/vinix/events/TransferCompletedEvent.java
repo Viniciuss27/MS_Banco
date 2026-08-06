@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public record TransferCompletedEvent(
-		Long id,
-	    Long sourceAccountId,
-	    Long targetAccountId,
-	    @JsonFormat(shape = JsonFormat.Shape.STRING)
-	    BigDecimal amount,
-	    LocalDateTime occurredAt
-	) {}
+        Long id,
+        Long sourceAccountId,
+        Long targetAccountId,
+        @JsonFormat(shape = JsonFormat.Shape.STRING)
+        BigDecimal amount,
+        LocalDateTime occurredAt
+) {}

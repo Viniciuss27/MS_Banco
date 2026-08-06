@@ -3,13 +3,10 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
 
     consumer:
-      group-id: notification-group
+      group-id: notification-string-test
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.use.type.headers: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
   application:
     name: notification
@@ -27,6 +24,7 @@ spring:
 server:
   port: ${PORT:0}
 
+
 eureka:
   instance:
     instance-id: ${spring.application.name}:${random.value}
@@ -38,6 +36,7 @@ eureka:
 
     register-with-eureka: true
     fetch-registry: true
+
 
 management:
   endpoints:

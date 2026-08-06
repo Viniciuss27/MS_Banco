@@ -1,5 +1,4 @@
 spring:
-
   application:
     name: wallet-core
 
@@ -12,7 +11,8 @@ spring:
       - optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -20,6 +20,8 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: America/Sao_Paulo
+    serialization:
+      write-dates-as-timestamps: false
 
   datasource:
     url: jdbc:h2:mem:walletdb
@@ -51,6 +53,7 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
   instance:
     prefer-ip-address: true
 
@@ -58,8 +61,12 @@ app:
   kafka:
     topics:
       transfer: transfer-events
+      deposit: deposit-events
+      withdraw: withdraw-events
+
 
 ---
+
 spring:
   config:
     activate:
