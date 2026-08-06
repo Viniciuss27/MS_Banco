@@ -11,21 +11,30 @@ import vinix.events.WithdrawCompletedEvent;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
-	private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-	@Override
-	public void notifyTransfer(TransferCompletedEvent event) {
-		log.info("Notificação: transferência de {} da conta {} para a conta {}", event.amount(),
-				event.sourceAccountId(), event.targetAccountId());
-	}
+    @Override
+    public void notifyTransfer(TransferCompletedEvent event) {
+        log.info("event=notify_transfer id={} sourceAccountId={} targetAccountId={} amount={}",
+                event.id(),
+                event.sourceAccountId(),
+                event.targetAccountId(),
+                event.amount());
+    }
 
-	@Override
-	public void notifyDeposit(DepositCompletedEvent event) {
-		log.info("Notificação: depósito de {} na conta {}", event.amount(), event.accountId());
-	}
+    @Override
+    public void notifyDeposit(DepositCompletedEvent event) {
+        log.info("event=notify_deposit id={} accountId={} amount={}",
+                event.id(),
+                event.accountId(),
+                event.amount());
+    }
 
-	@Override
-	public void notifyWithdraw(WithdrawCompletedEvent event) {
-		log.info("Notificação: saque de {} na conta {}", event.amount(), event.accountId());
-	}
+    @Override
+    public void notifyWithdraw(WithdrawCompletedEvent event) {
+        log.info("event=notify_withdraw id={} accountId={} amount={}",
+                event.id(),
+                event.accountId(),
+                event.amount());
+    }
 }

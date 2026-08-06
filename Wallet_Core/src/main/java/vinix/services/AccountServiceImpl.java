@@ -86,7 +86,7 @@ public class AccountServiceImpl implements AccountService {
                 "Depósito em conta" );
 
         eventPublisher.publishEvent(
-                new DepositCompletedEvent(account.getId(), dto.amount(), now()));
+                new DepositCompletedEvent(transaction.getId() ,account.getId(), dto.amount(), now()));
 
         return transactionMapper.toResponseDTO(transaction);
     }
@@ -112,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
                 "Saque em conta" );
 
         eventPublisher.publishEvent(
-                new WithdrawCompletedEvent(account.getId(), dto.amount(), now()) );
+                new WithdrawCompletedEvent(transaction.getId(), account.getId(), dto.amount(), now()) );
 
         return transactionMapper.toResponseDTO(transaction);
     }
@@ -159,11 +159,7 @@ public class AccountServiceImpl implements AccountService {
                 "Transferência recebida da conta " + source.getId());
 
         eventPublisher.publishEvent(
-                new TransferCompletedEvent(
-                        source.getId(),
-                        target.getId(),
-                        dto.amount(),
-                        now()));
+                new TransferCompletedEvent(out.getId(), source.getId(),target.getId(),dto.amount(),now()));
 
         return transactionMapper.toResponseDTOList(List.of(out, in));
     }
